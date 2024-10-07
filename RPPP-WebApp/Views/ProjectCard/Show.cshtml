@@ -1,0 +1,55 @@
+﻿@using RPPP_WebApp
+@using RPPP_WebApp.Controllers;
+@using RPPP_WebApp.Model
+
+@model RPPP_WebApp.ViewModels.ProjectCardTransactionsViewModel
+@{
+  ViewData["Title"] = "Transakcije projektne kartice";
+}
+
+<partial name="Get" model="@Model.ProjectCard" />
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>
+        Primatelj
+      </th>
+      <th>
+        Iznos (€)
+      </th>
+      <th>
+        Datum i vrijeme
+      </th>
+      <th>
+        Vrsta transakcije
+      </th>
+      <th>
+        Svrha transakcije
+      </th>
+      <th>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <partial name="NewTransaction" model="@new Transaction { Iban = Model.ProjectCard.Iban }" />
+    @foreach (var transaction in Model.Transaction) {
+      <partial name="GetTransaction" model="@transaction" />
+    }
+  </tbody>
+</table>
+
+@section scripts{
+  <script src="~/js/pager.js" asp-append-version="true"></script>
+  <script src="~/lib/htmx/htmx.min.js" asp-append-version="true"></script>
+  <partial name="IncludeValidation" />
+
+  <script>
+    document.body.addEventListener("showMessage", function (evt) {
+      toastr[evt.detail.messageType](evt.detail.message);
+    })
+    document.body.addEventListener("htmx:responseError", function (evt) {
+      toastr["error"](evt.detail.error);
+    })
+  </script>
+}

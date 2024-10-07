@@ -1,0 +1,107 @@
+﻿@using RPPP_WebApp
+@using RPPP_WebApp.Controllers;
+@using RPPP_WebApp.ViewModels;
+@using RPPP_WebApp.Model
+@model RPPP_WebApp.Model.ProjectRequirement
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>ProjectRequirement</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RequirementPriority)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RequirementPriority.Type)
+        </dd>
+        <dt class="col-sm-2">
+            Project Name
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Project.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Project Owner
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Project.Owner.Name)
+        </dd>
+    </dl>
+</div>
+<h2>Requirement Tasks</h2>
+
+<button hx-get="@Url.Action(nameof(ProjectRequirementsController.NewRequirementTask), new { projectRequirementId = Model.Id })"
+        hx-target="#newRequirementTaskContainer"
+        hx-swap="innerHTML"
+        class="btn btn-primary">
+    Add New Requirement Task
+</button>
+<div id="newRequirementTaskContainer"></div>
+
+@if (Model.RequirementTask != null && Model.RequirementTask.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Task ID</th>
+                <th>Planned Start Date</th>
+                <th>Planned End Date</th>
+                <th>Actual Start Date</th>
+                <th>Actual End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            @foreach (var task in Model.RequirementTask)
+            {
+                var viewModel = RequirementTaskViewModel.FromRequirementTask(task);
+                <partial name="GetRequirementTask" model="@viewModel" />
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No tasks associated with this requirement.</p>
+}
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index"
+       asp-action="Index"
+       asp-route-page="@ViewBag.Page"
+       asp-route-sort="@ViewBag.Sort"
+       asp-route-ascending="@ViewBag.Ascending">Back to List</a>
+</div>
+
+@section scripts{
+    <script src="~/js/pager.js" asp-append-version="true"></script>
+    <script src="~/lib/htmx/htmx.min.js" asp-append-version="true"></script>
+    <partial name="IncludeValidation" />
+
+    <script>
+        document.body.addEventListener("showMessage", function (evt) {
+            toastr[evt.detail.messageType](evt.detail.message);
+        })
+        document.body.addEventListener("htmx:responseError", function (evt) {
+            toastr["error"](evt.detail.error);
+        })
+    </script>
+}
